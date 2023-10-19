@@ -5,25 +5,29 @@
     <title>Hello wasm-pack!</title>
     <style>
       body {
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
+        padding: 1em;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
       }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
   </head>
-  <body>
-    <noscript
-      >This page contains webassembly and javascript content, please enable
-      javascript in your browser.</noscript
+  <body class="bg-neutral-200">
+    <canvas class="w-2/4" id="game-of-life-canvas"></canvas>
+    <button
+      class="inline-block rounded-md border border-transparent bg-indigo-600 px-3 py-3 text-center text-white hover:bg-indigo-700 my-4"
+      id="play-pause"
     >
-    <canvas id="game-of-life-canvas"></canvas>
-    <button id="play-pause"></button>
+      <i id="play-pause-icon"></i>
+    </button>
     <script src="./bootstrap.js"></script>
   </body>
 </html>

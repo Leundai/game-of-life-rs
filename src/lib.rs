@@ -132,8 +132,8 @@ impl Universe {
     pub fn new() -> Universe {
         utils::set_panic_hook();
 
-        let width: u32 = 64;
-        let height: u32 = 64;
+        let width: u32 = 200;
+        let height: u32 = 200;
         let cells = (0..width * height)
             .map(|_| {
                 if js_sys::Math::random() < 0.5 {
