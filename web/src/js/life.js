@@ -28,6 +28,15 @@ window.addEventListener("resize", (event) => {
     document.documentElement.clientHeight || 0,
     window.innerHeight || 0
   );
+
+  // Weird bug on mobile where the resize event is fired twice
+  if (
+    Math.floor(vw / (CELL_SIZE + 1)) == width &&
+    Math.floor(vh / (CELL_SIZE + 1)) == height
+  ) {
+    return;
+  }
+
   width = Math.floor(vw / (CELL_SIZE + 1));
   height = Math.floor(vh / (CELL_SIZE + 1));
   universe.resize(width, height);
