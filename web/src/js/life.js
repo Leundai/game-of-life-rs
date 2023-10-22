@@ -58,6 +58,26 @@ playPauseButton.addEventListener("click", (event) => {
   }
 });
 
+const resetButton = document.getElementById("reset");
+resetButton.addEventListener("click", (event) => {
+  universe.reset();
+  pause();
+  drawGrid();
+  drawCells();
+});
+
+const randomButton = document.getElementById("random");
+randomButton.addEventListener("click", (event) => {
+  universe.random();
+  drawGrid();
+  drawCells();
+});
+
+const speedSlider = document.getElementById("speed");
+speedSlider.addEventListener("input", (event) => {
+  universe.set_speed(event.target.value);
+});
+
 canvas.addEventListener("click", (event) => {
   const boundingRect = canvas.getBoundingClientRect();
 
