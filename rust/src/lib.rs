@@ -171,11 +171,8 @@ impl Universe {
         self.cells = Universe::get_random_universe(&self.width, &self.height);
     }
 
-    pub fn new() -> Universe {
+    pub fn new(width: u32, height: u32) -> Universe {
         utils::set_panic_hook();
-
-        let width: u32 = 200;
-        let height: u32 = 200;
         let cells = Universe::get_random_universe(&width, &height);
 
         Universe {
@@ -184,6 +181,12 @@ impl Universe {
             height,
             cells,
         }
+    }
+
+    pub fn resize(&mut self, width: u32, height: u32) {
+        self.width = width;
+        self.height = height;
+        self.reset()
     }
 
     pub fn render(&self) -> String {

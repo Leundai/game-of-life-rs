@@ -1,21 +1,46 @@
 import { Universe, Cell } from "../../../rust/pkg/wasm_game_of_life";
 import { memory } from "../../../rust/pkg/wasm_game_of_life_bg.wasm";
 
-const CELL_SIZE = 5; // px
+const CELL_SIZE = 10; // px
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
 
 // Construct the universe, and get its width and height.
-const universe = Universe.new();
-const width = universe.width();
-const height = universe.height();
+const vw = Math.max(
+  document.documentElement.clientWidth || 0,
+  window.innerWidth || 0
+);
+const vh = Math.max(
+  document.documentElement.clientHeight || 0,
+  window.innerHeight || 0
+);
+let width = Math.floor(vw / (CELL_SIZE + 1));
+let height = Math.floor(vh / (CELL_SIZE + 1));
+const universe = Universe.new(width, height);
+
+window.addEventListener("resize", (event) => {
+  const vw = Math.max(
+    document.documentElement.clientWidth || 0,
+    window.innerWidth || 0
+  );
+  const vh = Math.max(
+    document.documentElement.clientHeight || 0,
+    window.innerHeight || 0
+  );
+  width = Math.floor(vw / (CELL_SIZE + 1));
+  height = Math.floor(vh / (CELL_SIZE + 1));
+  universe.resize(width, height);
+  canvas.height = height * (CELL_SIZE + 1) + 1;
+  canvas.width = width * (CELL_SIZE + 1) + 1;
+  pause();
+});
 
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
 const canvas = document.getElementById("game-of-life-canvas");
-canvas.height = (CELL_SIZE + 1) * height + 1;
-canvas.width = (CELL_SIZE + 1) * width + 1;
+canvas.height = height * (CELL_SIZE + 1) + 1;
+canvas.width = width * (CELL_SIZE + 1) + 1;
 
 const ctx = canvas.getContext("2d");
 
