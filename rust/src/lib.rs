@@ -20,18 +20,27 @@ impl Cell {
     }
 }
 
+const DEFAULT_SPEED: u32 = 1;
+
 #[wasm_bindgen]
 pub struct Universe {
+    speed: u32,
     width: u32,
     height: u32,
     cells: Vec<Cell>,
 }
 
 impl Universe {
+    /**
+     * Returns the index of the cell in the universe
+     */
     fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
     }
 
+    /**
+     * Returns the number of live neighbors
+     */
     fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
         let mut count = 0;
         for delta_row in [self.height - 1, 0, 1].iter().cloned() {
@@ -65,41 +74,59 @@ impl Universe {
             self.cells[index] = Cell::Alive
         }
     }
+
+    /**
+     * Get random cells universe
+     */
+    pub fn get_random_universe(width: &u32, height: &u32) -> Vec<Cell> {
+        (0..width * height)
+            .map(|_| {
+                if js_sys::Math::random() < 0.5 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect()
+    }
 }
 
 #[wasm_bindgen]
 impl Universe {
+    /**
+     * Process the universe to the next generation
+     */
     pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
+        for _ in 0..self.speed {
+            let mut next = self.cells.clone();
+            for row in 0..self.height {
+                for col in 0..self.width {
+                    let idx = self.get_index(row, col);
+                    let cell = self.cells[idx];
+                    let live_neighbors = self.live_neighbor_count(row, col);
 
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let idx = self.get_index(row, col);
-                let cell = self.cells[idx];
-                let live_neighbors = self.live_neighbor_count(row, col);
+                    let next_cell = match (cell, live_neighbors) {
+                        // Rule 1: Any live cell with fewer than two live neighbours
+                        // dies, as if caused by underpopulation.
+                        (Cell::Alive, x) if x < 2 => Cell::Dead,
+                        // Rule 2: Any live cell with two or three live neighbours
+                        // lives on to the next generation.
+                        (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+                        // Rule 3: Any live cell with more than three live
+                        // neighbours dies, as if by overpopulation.
+                        (Cell::Alive, x) if x > 3 => Cell::Dead,
+                        // Rule 4: Any dead cell with exactly three live neighbours
+                        // becomes a live cell, as if by reproduction.
+                        (Cell::Dead, 3) => Cell::Alive,
+                        // All other cells remain in the same state.
+                        (otherwise, _) => otherwise,
+                    };
 
-                let next_cell = match (cell, live_neighbors) {
-                    // Rule 1: Any live cell with fewer than two live neighbours
-                    // dies, as if caused by underpopulation.
-                    (Cell::Alive, x) if x < 2 => Cell::Dead,
-                    // Rule 2: Any live cell with two or three live neighbours
-                    // lives on to the next generation.
-                    (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    // Rule 3: Any live cell with more than three live
-                    // neighbours dies, as if by overpopulation.
-                    (Cell::Alive, x) if x > 3 => Cell::Dead,
-                    // Rule 4: Any dead cell with exactly three live neighbours
-                    // becomes a live cell, as if by reproduction.
-                    (Cell::Dead, 3) => Cell::Alive,
-                    // All other cells remain in the same state.
-                    (otherwise, _) => otherwise,
-                };
-
-                next[idx] = next_cell;
+                    next[idx] = next_cell;
+                }
             }
+            self.cells = next;
         }
-
-        self.cells = next;
     }
 
     pub fn set_width(&mut self, width: u32) {
@@ -120,6 +147,13 @@ impl Universe {
         self.height
     }
 
+    pub fn set_speed(&mut self, speed: u32) {
+        self.speed = speed;
+    }
+
+    /**
+     * Returns a pointer to the cells
+     */
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
@@ -129,22 +163,23 @@ impl Universe {
         self.cells[index].toggle();
     }
 
+    pub fn reset(&mut self) {
+        self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
+    }
+
+    pub fn random(&mut self) {
+        self.cells = Universe::get_random_universe(&self.width, &self.height);
+    }
+
     pub fn new() -> Universe {
         utils::set_panic_hook();
 
         let width: u32 = 200;
         let height: u32 = 200;
-        let cells = (0..width * height)
-            .map(|_| {
-                if js_sys::Math::random() < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
+        let cells = Universe::get_random_universe(&width, &height);
 
         Universe {
+            speed: DEFAULT_SPEED,
             width,
             height,
             cells,
