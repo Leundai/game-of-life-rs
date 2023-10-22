@@ -2,7 +2,7 @@ import { Universe, Cell } from "../../../rust/pkg/wasm_game_of_life";
 import { memory } from "../../../rust/pkg/wasm_game_of_life_bg.wasm";
 
 const CELL_SIZE = 10; // px
-const GRID_COLOR = "#CCCCCC";
+const GRID_COLOR = "#e5e5e5";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
 
