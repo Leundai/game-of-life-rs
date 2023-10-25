@@ -173,7 +173,7 @@ impl Universe {
 
     pub fn new(width: u32, height: u32) -> Universe {
         utils::set_panic_hook();
-        let cells = Universe::get_random_universe(&width, &height);
+        let cells = (0..width * height).map(|_| Cell::Dead).collect();
 
         Universe {
             speed: DEFAULT_SPEED,
