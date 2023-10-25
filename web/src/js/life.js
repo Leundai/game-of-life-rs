@@ -192,4 +192,4 @@ const drawCells = () => {
 
 drawGrid();
 drawCells();
-play();
+pause();
